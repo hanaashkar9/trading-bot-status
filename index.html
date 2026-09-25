@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="300">
+<title>Trend Bot Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5F8; --card:#FFFFFF; --ink:#132033; --muted:#5E6B7C; --rule:#DCE2EA; --soft:#EEF2F7;
+  --accent:#2A78D6; --good:#1B8A55; --bad:#C23B31; --warn:#B7791F;
+  --s1:#2A78D6; --s2:#E8683A; --s3:#1B8A55; --s4:#C2417A; --s5:#8B5CD6; --s6:#8A96A6;
+  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0E1520; --card:#162131; --ink:#E7EDF5; --muted:#93A1B3; --rule:#27364A; --soft:#1C2A3D;
+  --accent:#5B9BEA; --good:#3CC486; --bad:#F06B5F; --warn:#E3A948;
+  --s1:#5B9BEA; --s2:#F08A5D; --s3:#3CC486; --s4:#E7709F; --s5:#AE8BEE; --s6:#8795A8; color-scheme:dark;}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);padding:0 16px 48px}
+.wrap{max-width:1180px;margin:0 auto}
+header{padding:28px 0 18px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+h1{font-size:26px;line-height:1.2;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font:600 13px var(--sans);border:1px solid var(--rule);background:var(--card)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--good)}
+.badge.warn .dot{background:var(--warn)} .badge.down .dot{background:var(--bad)}
+.meta{color:var(--muted);font:13px var(--mono);text-align:right}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:30px 0 12px;font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:16px}
+.card.main{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.card .k{font:600 12px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.card .sw{width:10px;height:10px;border-radius:3px}
+.card .v{font:600 26px var(--mono);margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.card .r{font:600 15px var(--mono)}
+.card .d{color:var(--muted);font-size:13px;margin-top:8px}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.panel{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:16px}
+.chartbox{position:relative}
+svg{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 10px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;font:12px var(--mono);box-shadow:0 4px 14px rgba(0,0,0,.12);display:none;white-space:nowrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--soft);white-space:nowrap;font-variant-numeric:tabular-nums}
+td.n,th.n{text-align:right;font-family:var(--mono)}
+tr:last-child td{border-bottom:0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tabs button{font:500 13px var(--sans);padding:6px 12px;border-radius:8px;border:1px solid var(--rule);background:var(--card);color:var(--ink);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.pill{font:600 11px var(--mono);padding:2px 7px;border-radius:5px;background:var(--soft)}
+.ok{color:var(--good);font-weight:600} .no{color:var(--bad);font-weight:600}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--mono)}
+.note{color:var(--muted);font-size:13px;margin:10px 0 0;max-width:75ch}
+.alert{border:1px solid var(--bad);color:var(--bad);border-radius:10px;padding:10px 14px;margin-top:10px;font-size:14px;background:var(--card)}
+footer{color:var(--muted);font-size:13px;margin-top:36px;border-top:1px solid var(--rule);padding-top:16px;max-width:80ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Hanna &amp; Kareem Trend Bot — live status</h1>
+      <p class="sub">Paper wallets and the Binance demo account, updated every hour. Fake money only; nothing here is real funds.</p>
+    </div>
+    <div>
+      <div id="health" class="badge"><span class="dot"></span><span id="healthText">…</span></div>
+      <div class="meta" id="updated"></div>
+    </div>
+  </header>
+  <div id="problem"></div>
+
+  <h2>Wallets</h2>
+  <div class="cards" id="cards"></div>
+
+  <h2>Return since each wallet started</h2>
+  <div class="panel chartbox">
+    <div class="legend" id="legend"></div>
+    <div id="chart"></div>
+    <div class="tip" id="tip"></div>
+    <p class="note">Hourly marks. A few days of live trading is noise: judge it over weeks, against the backtest pace below.</p>
+  </div>
+
+  <h2>Live vs backtest: is the bot behaving as expected?</h2>
+  <div class="grid2">
+    <div class="panel chartbox"><div id="cone"></div>
+      <p class="note">Shaded bands: 10,000 possible futures resampled from the backtest's own days (dark = middle 50%, light = 90%). Red: the live main wallet. Inside the band = trading like the backtest. Below the light band, or a drop worse than the alarm line, = stop and investigate.</p></div>
+    <div class="panel"><dl class="kv" id="conekv"></dl></div>
+  </div>
+
+  <h2>Binance demo account (real orders, fake money)</h2>
+  <div class="grid2">
+    <div class="panel" id="demo"></div>
+    <div class="panel"><div class="tbl" id="recon"></div></div>
+  </div>
+  <div class="panel" style="margin-top:12px"><div class="tbl" id="orders"></div></div>
+
+  <h2>Open positions</h2>
+  <div class="panel">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="tbl" id="positions"></div>
+  </div>
+
+  <h2>Recent closed trades</h2>
+  <div class="panel"><div class="tbl" id="trades"></div></div>
+
+  <h2>Market gauges and what to expect</h2>
+  <div class="grid2">
+    <div class="panel"><dl class="kv" id="gauges"></dl></div>
+    <div class="panel"><dl class="kv" id="expect"></dl></div>
+  </div>
+
+  <footer>
+    <p><b>How it works.</b> Every hour the bot reads Binance prices for the 30 most-traded coins. Hanna's multi-speed trend signal buys coins that start trending up; Kareem's CUSUM alarm flags big moves, Hanna's trend picks the side, and a Random Forest keeps only trades with more than a 55% estimated chance of profit. The wallet sizes each bet by volatility, targets 20% yearly volatility, and halves new bets when the market is crowded. Exits: trend flips, stop-loss (about two days' normal move), or 30 days.</p>
+    <p>Paper wallets fill at the hourly close with the backtest's fees and slippage. The demo wallet sends real market orders to Binance's futures demo exchange; the table above checks its book against the exchange. The AI news score is logged only and never trades.</p>
+  </footer>
+</div>
+<script>
+const D = {"generated": "2026-09-26T20:03:35.061110+00:00", "wallets": [{"name": "v33", "label": "Main system", "about": "v3.3: both signals, RF filter, 20% yearly-vol target, crowding brake", "broker": "paper", "created": "2026-09-25 11:53", "start": 10000.0, "equity": 10025.89, "cash": 10000.65, "ret_pct": 0.26, "realized": 0.65, "n_closed": 1, "wins": 1, "last_bar": "2026-09-26 19:00", "size_mult": 0.446, "crowding_apr": 0.0548, "vrp": null, "note": "started 2026-09-25 as v3.2; crowding brake added the same day (v3.3)", "positions": [{"sleeve": "H", "symbol": "NEAR", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 4.958, "last": 4.833, "stop": 4.003551752808532, "notional": 69.5, "pnl": -1.86, "pnl_pct": -2.52, "to_stop_pct": 20.7, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ZEC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 1598.95, "last": 1569.1, "stop": 1415.1905618983853, "notional": 116.42, "pnl": -2.32, "pnl_pct": -1.87, "to_stop_pct": 10.9, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "UNI", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 9.311, "last": 9.533, "stop": 7.7725162179718135, "notional": 80.98, "pnl": 1.79, "pnl_pct": 2.38, "to_stop_pct": 22.7, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 119.15, "last": 121.08, "stop": 112.34431648957995, "notional": 223.0, "pnl": 3.37, "pnl_pct": 1.62, "to_stop_pct": 7.8, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SUI", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 1.0708, "last": 1.1598, "stop": 0.9360572747955633, "notional": 106.33, "pnl": 8.71, "pnl_pct": 8.31, "to_stop_pct": 23.9, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ENA", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 0.22867, "last": 0.27222, "stop": 0.18846262012962076, "notional": 76.1, "pnl": 14.39, "pnl_pct": 19.04, "to_stop_pct": 44.4, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 84678.3, "last": 83985.3, "stop": 81342.20224544355, "notional": 223.0, "pnl": -2.04, "pnl_pct": -0.82, "to_stop_pct": 3.2, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "HK", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 84678.3, "last": 83985.3, "stop": 81342.20224544355, "notional": 223.0, "pnl": -2.04, "pnl_pct": -0.82, "to_stop_pct": 3.2, "held_h": 33, "rf": 0.587, "llm": null}, {"sleeve": "HK", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 119.15, "last": 121.08, "stop": 112.34431648957995, "notional": 223.0, "pnl": 3.37, "pnl_pct": 1.62, "to_stop_pct": 7.8, "held_h": 33, "rf": 0.563, "llm": null}, {"sleeve": "HK", "symbol": "ADA", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 0.2526, "last": 0.2542, "stop": 0.23018037161763394, "notional": 150.75, "pnl": 0.78, "pnl_pct": 0.63, "to_stop_pct": 10.4, "held_h": 33, "rf": 0.576, "llm": null}, {"sleeve": "HK", "symbol": "AKE", "side": "SHORT", "entry_ts": "2026-09-25 11:00", "entry": 0.035426, "last": 0.033805, "stop": 0.05514344397040702, "notional": 24.04, "pnl": 1.09, "pnl_pct": 4.58, "to_stop_pct": 38.7, "held_h": 33, "rf": 0.559, "llm": null}], "curve": [["2026-09-25 11:00", 10020.78], ["2026-09-25 12:00", 10024.06], ["2026-09-25 13:00", 10013.68], ["2026-09-25 14:00", 10017.87], ["2026-09-25 15:00", 10008.75], ["2026-09-25 16:00", 10012.8], ["2026-09-25 17:00", 10016.48], ["2026-09-25 18:00", 10025.2], ["2026-09-25 19:00", 10026.82], ["2026-09-25 20:00", 10027.41], ["2026-09-25 21:00", 10018.61], ["2026-09-25 22:00", 10034.32], ["2026-09-25 23:00", 10037.04], ["2026-09-26 00:00", 10028.25], ["2026-09-26 01:00", 10034.13], ["2026-09-26 02:00", 10029.19], ["2026-09-26 03:00", 10024.23], ["2026-09-26 04:00", 10028.16], ["2026-09-26 05:00", 10022.55], ["2026-09-26 06:00", 10018.05], ["2026-09-26 07:00", 10023.48], ["2026-09-26 08:00", 10026.21], ["2026-09-26 09:00", 10022.31], ["2026-09-26 10:00", 10033.78], ["2026-09-26 11:00", 10032.48], ["2026-09-26 12:00", 10029.13], ["2026-09-26 13:00", 10027.42], ["2026-09-26 14:00", 10030.5], ["2026-09-26 15:00", 10036.1], ["2026-09-26 16:00", 10033.33], ["2026-09-26 17:00", 10030.74], ["2026-09-26 18:00", 10024.48], ["2026-09-26 19:00", 10025.9]], "trades": [{"id": "ccbd7eb5", "sleeve": "HK", "symbol": "PUMPUSDT", "side": -1, "entry_ts": "2026-09-25 11:00:00+00:00", "entry_px": 0.004177, "exit_ts": "2026-09-25 14:00:00+00:00", "exit_px": 0.004145, "exit_reason": "trend flip", "notional": 110.01, "pnl": 0.65, "return_%": 0.59, "llm_coin": "", "llm_market": ""}], "treasury": 0.11, "treasury_rate": 0.0308}, {"name": "v33_testnet", "label": "Binance demo", "about": "v3.3 with real orders on Binance's futures demo exchange (fake money)", "broker": "testnet", "created": "2026-09-26 10:44", "start": 5000.0, "equity": 4996.46, "cash": 5000.0, "ret_pct": -0.07, "realized": 0.0, "n_closed": 0, "wins": 0, "last_bar": "2026-09-26 19:00", "size_mult": 0.446, "crowding_apr": 0.0548, "vrp": null, "note": "", "positions": [{"sleeve": "H", "symbol": "NEAR", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 4.911, "last": 4.833, "stop": 4.053501768951857, "notional": 34.38, "pnl": -0.59, "pnl_pct": -1.59, "to_stop_pct": 19.2, "held_h": 10, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ZEC", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 1529.78, "last": 1569.1, "stop": 1367.8052332285072, "notional": 62.72, "pnl": 1.55, "pnl_pct": 2.57, "to_stop_pct": 14.7, "held_h": 10, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "UNI", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 9.717, "last": 9.533, "stop": 8.210704112049607, "notional": 38.87, "pnl": -0.79, "pnl_pct": -1.89, "to_stop_pct": 16.1, "held_h": 10, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 120.6, "last": 121.08, "stop": 113.78456548912834, "notional": 110.95, "pnl": 0.33, "pnl_pct": 0.4, "to_stop_pct": 6.4, "held_h": 10, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SUI", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 1.1815, "last": 1.1598, "stop": 1.0246273738829537, "notional": 50.33, "pnl": -0.97, "pnl_pct": -1.84, "to_stop_pct": 13.2, "held_h": 10, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ENA", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 0.2835, "last": 0.27222, "stop": 0.23459316550354814, "notional": 38.56, "pnl": -1.57, "pnl_pct": -3.98, "to_stop_pct": 16.0, "held_h": 10, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 84100.9, "last": 83985.3, "stop": 81099.54602401506, "notional": 109.33, "pnl": -0.25, "pnl_pct": -0.14, "to_stop_pct": 3.6, "held_h": 10, "rf": null, "llm": null}, {"sleeve": "HK", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 84100.9, "last": 83985.3, "stop": 81099.54602401506, "notional": 109.33, "pnl": -0.25, "pnl_pct": -0.14, "to_stop_pct": 3.6, "held_h": 10, "rf": 0.587, "llm": null}, {"sleeve": "HK", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 120.6, "last": 121.08, "stop": 113.78456548912834, "notional": 110.95, "pnl": 0.33, "pnl_pct": 0.4, "to_stop_pct": 6.4, "held_h": 10, "rf": 0.563, "llm": null}, {"sleeve": "HK", "symbol": "ADA", "side": "LONG", "entry_ts": "2026-09-26 10:00", "entry": 0.2565, "last": 0.2542, "stop": 0.2346734094028719, "notional": 78.49, "pnl": -0.78, "pnl_pct": -0.9, "to_stop_pct": 8.3, "held_h": 10, "rf": 0.576, "llm": null}, {"sleeve": "HK", "symbol": "AKE", "side": "SHORT", "entry_ts": "2026-09-26 10:00", "entry": 0.0324565, "last": 0.033805, "stop": 0.04905555024001908, "notional": 13.08, "pnl": -0.55, "pnl_pct": -4.15, "to_stop_pct": 31.1, "held_h": 10, "rf": 0.559, "llm": null}], "curve": [["2026-09-26 10:00", 4999.74], ["2026-09-26 11:00", 4999.14], ["2026-09-26 12:00", 4997.62], ["2026-09-26 13:00", 4996.71], ["2026-09-26 14:00", 4998.34], ["2026-09-26 15:00", 5001.15], ["2026-09-26 16:00", 4999.91], ["2026-09-26 17:00", 4998.73], ["2026-09-26 18:00", 4995.7], ["2026-09-26 19:00", 4996.45]], "trades": [], "treasury": null, "treasury_rate": null}, {"name": "v33_growth", "label": "Growth", "about": "v3.3 with a 30% yearly-vol target (bigger bets)", "broker": "paper", "created": "2026-09-25 13:14", "start": 10000.0, "equity": 9999.19, "cash": 10002.39, "ret_pct": -0.01, "realized": 2.39, "n_closed": 1, "wins": 1, "last_bar": "2026-09-26 19:00", "size_mult": 0.67, "crowding_apr": 0.0548, "vrp": null, "note": "", "positions": [{"sleeve": "H", "symbol": "NEAR", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 5.054, "last": 4.833, "stop": 4.090672245730088, "notional": 105.3, "pnl": -4.77, "pnl_pct": -4.37, "to_stop_pct": 18.1, "held_h": 31, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ZEC", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 1605.19, "last": 1569.1, "stop": 1422.724622135169, "notional": 176.56, "pnl": -4.19, "pnl_pct": -2.25, "to_stop_pct": 10.3, "held_h": 31, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "UNI", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 9.853, "last": 9.533, "stop": 8.173152369107344, "notional": 117.72, "pnl": -4.03, "pnl_pct": -3.25, "to_stop_pct": 16.6, "held_h": 31, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 120.69, "last": 121.08, "stop": 113.67432110808193, "notional": 334.5, "pnl": 0.73, "pnl_pct": 0.32, "to_stop_pct": 6.5, "held_h": 31, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SUI", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 1.1463, "last": 1.1598, "stop": 0.9861749228779083, "notional": 143.68, "pnl": 1.52, "pnl_pct": 1.18, "to_stop_pct": 17.6, "held_h": 31, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ENA", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 0.24443, "last": 0.27222, "stop": 0.19978251873911546, "notional": 109.88, "pnl": 12.35, "pnl_pct": 11.37, "to_stop_pct": 36.3, "held_h": 31, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 84427.8, "last": 83985.3, "stop": 81133.82447541403, "notional": 334.5, "pnl": -2.07, "pnl_pct": -0.52, "to_stop_pct": 3.5, "held_h": 31, "rf": null, "llm": null}, {"sleeve": "HK", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 84427.8, "last": 83985.3, "stop": 81133.82447541403, "notional": 334.5, "pnl": -2.07, "pnl_pct": -0.52, "to_stop_pct": 3.5, "held_h": 31, "rf": 0.587, "llm": null}, {"sleeve": "HK", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 120.69, "last": 121.08, "stop": 113.67432110808193, "notional": 334.5, "pnl": 0.73, "pnl_pct": 0.32, "to_stop_pct": 6.5, "held_h": 31, "rf": 0.563, "llm": null}, {"sleeve": "HK", "symbol": "ADA", "side": "LONG", "entry_ts": "2026-09-25 13:00", "entry": 0.2574, "last": 0.2542, "stop": 0.23458364773528512, "notional": 226.42, "pnl": -3.08, "pnl_pct": -1.24, "to_stop_pct": 8.4, "held_h": 31, "rf": 0.576, "llm": null}, {"sleeve": "HK", "symbol": "AKE", "side": "SHORT", "entry_ts": "2026-09-25 13:00", "entry": 0.035453, "last": 0.033805, "stop": 0.05495581265813668, "notional": 36.48, "pnl": 1.68, "pnl_pct": 4.65, "to_stop_pct": 38.5, "held_h": 31, "rf": 0.559, "llm": null}], "curve": [["2026-09-25 13:00", 9982.85], ["2026-09-25 14:00", 9988.71], ["2026-09-25 15:00", 9975.73], ["2026-09-25 16:00", 9981.47], ["2026-09-25 17:00", 9986.33], ["2026-09-25 18:00", 9999.15], ["2026-09-25 19:00", 10001.28], ["2026-09-25 20:00", 10001.48], ["2026-09-25 21:00", 9988.88], ["2026-09-25 22:00", 10011.3], ["2026-09-25 23:00", 10015.01], ["2026-09-26 00:00", 10002.37], ["2026-09-26 01:00", 10011.14], ["2026-09-26 02:00", 10003.92], ["2026-09-26 03:00", 9996.47], ["2026-09-26 04:00", 10001.96], ["2026-09-26 05:00", 9994.16], ["2026-09-26 06:00", 9987.76], ["2026-09-26 07:00", 9995.3], ["2026-09-26 08:00", 9999.16], ["2026-09-26 09:00", 9993.4], ["2026-09-26 10:00", 10009.58], ["2026-09-26 11:00", 10008.02], ["2026-09-26 12:00", 10003.29], ["2026-09-26 13:00", 10000.6], ["2026-09-26 14:00", 10005.2], ["2026-09-26 15:00", 10013.45], ["2026-09-26 16:00", 10009.52], ["2026-09-26 17:00", 10005.98], ["2026-09-26 18:00", 9997.11], ["2026-09-26 19:00", 9999.18]], "trades": [{"id": "141eecf2", "sleeve": "HK", "symbol": "PUMPUSDT", "side": -1, "entry_ts": "2026-09-25 13:00:00+00:00", "entry_px": 0.004213, "exit_ts": "2026-09-25 14:00:00+00:00", "exit_px": 0.004145, "exit_reason": "trend flip", "notional": 166.75, "pnl": 2.39, "return_%": 1.44, "llm_coin": "", "llm_market": ""}], "treasury": 0.11, "treasury_rate": 0.0308}, {"name": "v33_lev40", "label": "Leverage 40%", "about": "v3.3 with a 40% yearly-vol target, up to 3x (more leverage, cloned from main)", "broker": "paper", "created": "2026-09-25 21:35", "start": 10000.0, "equity": 10025.89, "cash": 10000.65, "ret_pct": 0.26, "realized": 0.0, "n_closed": 0, "wins": 0, "last_bar": "2026-09-26 19:00", "size_mult": 0.893, "crowding_apr": 0.0548, "vrp": null, "note": "cloned from v33 on 2026-09-26: leverage test, 40% wallet-vol target, cap 3x", "positions": [{"sleeve": "H", "symbol": "NEAR", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 4.958, "last": 4.833, "stop": 4.003551752808532, "notional": 69.5, "pnl": -1.86, "pnl_pct": -2.52, "to_stop_pct": 20.7, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ZEC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 1598.95, "last": 1569.1, "stop": 1415.1905618983853, "notional": 116.42, "pnl": -2.32, "pnl_pct": -1.87, "to_stop_pct": 10.9, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "UNI", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 9.311, "last": 9.533, "stop": 7.7725162179718135, "notional": 80.98, "pnl": 1.79, "pnl_pct": 2.38, "to_stop_pct": 22.7, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 119.15, "last": 121.08, "stop": 112.34431648957995, "notional": 223.0, "pnl": 3.37, "pnl_pct": 1.62, "to_stop_pct": 7.8, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SUI", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 1.0708, "last": 1.1598, "stop": 0.9360572747955633, "notional": 106.33, "pnl": 8.71, "pnl_pct": 8.31, "to_stop_pct": 23.9, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ENA", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 0.22867, "last": 0.27222, "stop": 0.18846262012962076, "notional": 76.1, "pnl": 14.39, "pnl_pct": 19.04, "to_stop_pct": 44.4, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 84678.3, "last": 83985.3, "stop": 81342.20224544355, "notional": 223.0, "pnl": -2.04, "pnl_pct": -0.82, "to_stop_pct": 3.2, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "HK", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 84678.3, "last": 83985.3, "stop": 81342.20224544355, "notional": 223.0, "pnl": -2.04, "pnl_pct": -0.82, "to_stop_pct": 3.2, "held_h": 33, "rf": 0.587, "llm": null}, {"sleeve": "HK", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 119.15, "last": 121.08, "stop": 112.34431648957995, "notional": 223.0, "pnl": 3.37, "pnl_pct": 1.62, "to_stop_pct": 7.8, "held_h": 33, "rf": 0.563, "llm": null}, {"sleeve": "HK", "symbol": "ADA", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 0.2526, "last": 0.2542, "stop": 0.23018037161763394, "notional": 150.75, "pnl": 0.78, "pnl_pct": 0.63, "to_stop_pct": 10.4, "held_h": 33, "rf": 0.576, "llm": null}, {"sleeve": "HK", "symbol": "AKE", "side": "SHORT", "entry_ts": "2026-09-25 11:00", "entry": 0.035426, "last": 0.033805, "stop": 0.05514344397040702, "notional": 24.04, "pnl": 1.09, "pnl_pct": 4.58, "to_stop_pct": 38.7, "held_h": 33, "rf": 0.559, "llm": null}], "curve": [["2026-09-25 21:00", 10018.61], ["2026-09-25 22:00", 10034.32], ["2026-09-25 23:00", 10037.04], ["2026-09-26 00:00", 10028.25], ["2026-09-26 01:00", 10034.13], ["2026-09-26 02:00", 10029.19], ["2026-09-26 03:00", 10024.23], ["2026-09-26 04:00", 10028.16], ["2026-09-26 05:00", 10022.55], ["2026-09-26 06:00", 10018.05], ["2026-09-26 07:00", 10023.48], ["2026-09-26 08:00", 10026.21], ["2026-09-26 09:00", 10022.31], ["2026-09-26 10:00", 10033.78], ["2026-09-26 11:00", 10032.48], ["2026-09-26 12:00", 10029.13], ["2026-09-26 13:00", 10027.42], ["2026-09-26 14:00", 10030.5], ["2026-09-26 15:00", 10036.1], ["2026-09-26 16:00", 10033.33], ["2026-09-26 17:00", 10030.74], ["2026-09-26 18:00", 10024.48], ["2026-09-26 19:00", 10025.9]], "trades": [], "treasury": 0.11, "treasury_rate": 0.0308}, {"name": "v33_vrp", "label": "Stress-brake test", "about": "v3.3 + options-market stress brake (forward test, cloned from main)", "broker": "paper", "created": "2026-09-25 15:52", "start": 10000.0, "equity": 10025.89, "cash": 10000.65, "ret_pct": 0.26, "realized": 0.0, "n_closed": 0, "wins": 0, "last_bar": "2026-09-26 19:00", "size_mult": 0.446, "crowding_apr": 0.0548, "vrp": 0.47, "note": "cloned from v33 on 2026-09-25 (trial 35 D2 forward shadow: + VRP brake)", "positions": [{"sleeve": "H", "symbol": "NEAR", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 4.958, "last": 4.833, "stop": 4.003551752808532, "notional": 69.5, "pnl": -1.86, "pnl_pct": -2.52, "to_stop_pct": 20.7, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ZEC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 1598.95, "last": 1569.1, "stop": 1415.1905618983853, "notional": 116.42, "pnl": -2.32, "pnl_pct": -1.87, "to_stop_pct": 10.9, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "UNI", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 9.311, "last": 9.533, "stop": 7.7725162179718135, "notional": 80.98, "pnl": 1.79, "pnl_pct": 2.38, "to_stop_pct": 22.7, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 119.15, "last": 121.08, "stop": 112.34431648957995, "notional": 223.0, "pnl": 3.37, "pnl_pct": 1.62, "to_stop_pct": 7.8, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SUI", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 1.0708, "last": 1.1598, "stop": 0.9360572747955633, "notional": 106.33, "pnl": 8.71, "pnl_pct": 8.31, "to_stop_pct": 23.9, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ENA", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 0.22867, "last": 0.27222, "stop": 0.18846262012962076, "notional": 76.1, "pnl": 14.39, "pnl_pct": 19.04, "to_stop_pct": 44.4, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 84678.3, "last": 83985.3, "stop": 81342.20224544355, "notional": 223.0, "pnl": -2.04, "pnl_pct": -0.82, "to_stop_pct": 3.2, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "HK", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 84678.3, "last": 83985.3, "stop": 81342.20224544355, "notional": 223.0, "pnl": -2.04, "pnl_pct": -0.82, "to_stop_pct": 3.2, "held_h": 33, "rf": 0.587, "llm": null}, {"sleeve": "HK", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 119.15, "last": 121.08, "stop": 112.34431648957995, "notional": 223.0, "pnl": 3.37, "pnl_pct": 1.62, "to_stop_pct": 7.8, "held_h": 33, "rf": 0.563, "llm": null}, {"sleeve": "HK", "symbol": "ADA", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 0.2526, "last": 0.2542, "stop": 0.23018037161763394, "notional": 150.75, "pnl": 0.78, "pnl_pct": 0.63, "to_stop_pct": 10.4, "held_h": 33, "rf": 0.576, "llm": null}, {"sleeve": "HK", "symbol": "AKE", "side": "SHORT", "entry_ts": "2026-09-25 11:00", "entry": 0.035426, "last": 0.033805, "stop": 0.05514344397040702, "notional": 24.04, "pnl": 1.09, "pnl_pct": 4.58, "to_stop_pct": 38.7, "held_h": 33, "rf": 0.559, "llm": null}], "curve": [["2026-09-25 15:00", 10008.75], ["2026-09-25 16:00", 10012.8], ["2026-09-25 17:00", 10016.48], ["2026-09-25 18:00", 10025.2], ["2026-09-25 19:00", 10026.82], ["2026-09-25 20:00", 10027.41], ["2026-09-25 21:00", 10018.61], ["2026-09-25 22:00", 10034.32], ["2026-09-25 23:00", 10037.04], ["2026-09-26 00:00", 10028.25], ["2026-09-26 01:00", 10034.13], ["2026-09-26 02:00", 10029.19], ["2026-09-26 03:00", 10024.23], ["2026-09-26 04:00", 10028.16], ["2026-09-26 05:00", 10022.55], ["2026-09-26 06:00", 10018.05], ["2026-09-26 07:00", 10023.48], ["2026-09-26 08:00", 10026.21], ["2026-09-26 09:00", 10022.31], ["2026-09-26 10:00", 10033.78], ["2026-09-26 11:00", 10032.48], ["2026-09-26 12:00", 10029.13], ["2026-09-26 13:00", 10027.42], ["2026-09-26 14:00", 10030.5], ["2026-09-26 15:00", 10036.1], ["2026-09-26 16:00", 10033.33], ["2026-09-26 17:00", 10030.74], ["2026-09-26 18:00", 10024.48], ["2026-09-26 19:00", 10025.9]], "trades": [], "treasury": 0.11, "treasury_rate": 0.0308}, {"name": "v33_age", "label": "Old-coins-first test", "about": "v3.3 with trend bets sized by coin age: the AI alpha factory's one survivor (forward test, cloned from main)", "broker": "paper", "created": "2026-09-26 12:19", "start": 10000.0, "equity": 10025.89, "cash": 10000.65, "ret_pct": 0.26, "realized": 0.0, "n_closed": 0, "wins": 0, "last_bar": "2026-09-26 19:00", "size_mult": 0.446, "crowding_apr": 0.0548, "vrp": null, "note": "cloned from v33 (same cash and positions) for the trial 43 A2 age-tilt forward shadow", "positions": [{"sleeve": "H", "symbol": "NEAR", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 4.958, "last": 4.833, "stop": 4.003551752808532, "notional": 69.5, "pnl": -1.86, "pnl_pct": -2.52, "to_stop_pct": 20.7, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ZEC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 1598.95, "last": 1569.1, "stop": 1415.1905618983853, "notional": 116.42, "pnl": -2.32, "pnl_pct": -1.87, "to_stop_pct": 10.9, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "UNI", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 9.311, "last": 9.533, "stop": 7.7725162179718135, "notional": 80.98, "pnl": 1.79, "pnl_pct": 2.38, "to_stop_pct": 22.7, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 119.15, "last": 121.08, "stop": 112.34431648957995, "notional": 223.0, "pnl": 3.37, "pnl_pct": 1.62, "to_stop_pct": 7.8, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SUI", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 1.0708, "last": 1.1598, "stop": 0.9360572747955633, "notional": 106.33, "pnl": 8.71, "pnl_pct": 8.31, "to_stop_pct": 23.9, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ENA", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 0.22867, "last": 0.27222, "stop": 0.18846262012962076, "notional": 76.1, "pnl": 14.39, "pnl_pct": 19.04, "to_stop_pct": 44.4, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 84678.3, "last": 83985.3, "stop": 81342.20224544355, "notional": 223.0, "pnl": -2.04, "pnl_pct": -0.82, "to_stop_pct": 3.2, "held_h": 33, "rf": null, "llm": null}, {"sleeve": "HK", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 84678.3, "last": 83985.3, "stop": 81342.20224544355, "notional": 223.0, "pnl": -2.04, "pnl_pct": -0.82, "to_stop_pct": 3.2, "held_h": 33, "rf": 0.587, "llm": null}, {"sleeve": "HK", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 119.15, "last": 121.08, "stop": 112.34431648957995, "notional": 223.0, "pnl": 3.37, "pnl_pct": 1.62, "to_stop_pct": 7.8, "held_h": 33, "rf": 0.563, "llm": null}, {"sleeve": "HK", "symbol": "ADA", "side": "LONG", "entry_ts": "2026-09-25 11:00", "entry": 0.2526, "last": 0.2542, "stop": 0.23018037161763394, "notional": 150.75, "pnl": 0.78, "pnl_pct": 0.63, "to_stop_pct": 10.4, "held_h": 33, "rf": 0.576, "llm": null}, {"sleeve": "HK", "symbol": "AKE", "side": "SHORT", "entry_ts": "2026-09-25 11:00", "entry": 0.035426, "last": 0.033805, "stop": 0.05514344397040702, "notional": 24.04, "pnl": 1.09, "pnl_pct": 4.58, "to_stop_pct": 38.7, "held_h": 33, "rf": 0.559, "llm": null}], "curve": [["2026-09-26 12:00", 10029.13], ["2026-09-26 13:00", 10027.42], ["2026-09-26 14:00", 10030.5], ["2026-09-26 15:00", 10036.1], ["2026-09-26 16:00", 10033.33], ["2026-09-26 17:00", 10030.74], ["2026-09-26 18:00", 10024.48], ["2026-09-26 19:00", 10025.9]], "trades": [], "treasury": 0.11, "treasury_rate": 0.0308}, {"name": "v31", "label": "Original v3.1", "about": "v3.1: no wallet vol target, no brake (reference)", "broker": "paper", "created": "2026-09-25 09:06", "start": 10000.0, "equity": 10090.66, "cash": 9986.22, "ret_pct": 0.91, "realized": -14.46, "n_closed": 3, "wins": 0, "last_bar": "2026-09-26 19:00", "size_mult": 1.0, "crowding_apr": 0.0548, "vrp": null, "note": "", "positions": [{"sleeve": "H", "symbol": "NEAR", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 4.706, "last": 4.833, "stop": 3.8134920385917304, "notional": 158.18, "pnl": 4.01, "pnl_pct": 2.7, "to_stop_pct": 26.7, "held_h": 35, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ZEC", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 1586.27, "last": 1569.1, "stop": 1402.3227922875342, "notional": 258.71, "pnl": -3.12, "pnl_pct": -1.08, "to_stop_pct": 11.9, "held_h": 35, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "UNI", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 9.255, "last": 9.533, "stop": 7.707847687543644, "notional": 179.46, "pnl": 5.08, "pnl_pct": 3.0, "to_stop_pct": 23.7, "held_h": 35, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 117.28, "last": 121.08, "stop": 110.63368114511938, "notional": 500.0, "pnl": 15.67, "pnl_pct": 3.24, "to_stop_pct": 9.4, "held_h": 35, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "SUI", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 1.0297, "last": 1.1598, "stop": 0.9021803078194912, "notional": 242.24, "pnl": 30.31, "pnl_pct": 12.63, "to_stop_pct": 28.6, "held_h": 35, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "ENA", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 0.22239, "last": 0.27222, "stop": 0.1831294452506025, "notional": 169.93, "pnl": 37.84, "pnl_pct": 22.41, "to_stop_pct": 48.6, "held_h": 35, "rf": null, "llm": null}, {"sleeve": "H", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 84376.1, "last": 83985.3, "stop": 81018.27686969581, "notional": 500.0, "pnl": -2.79, "pnl_pct": -0.46, "to_stop_pct": 3.7, "held_h": 35, "rf": null, "llm": null}, {"sleeve": "HK", "symbol": "BTC", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 84376.1, "last": 83985.3, "stop": 81018.27686969581, "notional": 500.0, "pnl": -2.79, "pnl_pct": -0.46, "to_stop_pct": 3.7, "held_h": 35, "rf": 0.583, "llm": null}, {"sleeve": "HK", "symbol": "SOL", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 117.28, "last": 121.08, "stop": 110.63368114511938, "notional": 500.0, "pnl": 15.67, "pnl_pct": 3.24, "to_stop_pct": 9.4, "held_h": 35, "rf": 0.561, "llm": null}, {"sleeve": "HK", "symbol": "ADA", "side": "LONG", "entry_ts": "2026-09-25 09:00", "entry": 0.2519, "last": 0.2542, "stop": 0.2293046551567665, "notional": 334.45, "pnl": 2.66, "pnl_pct": 0.91, "to_stop_pct": 10.9, "held_h": 35, "rf": 0.569, "llm": null}, {"sleeve": "HK", "symbol": "AKE", "side": "SHORT", "entry_ts": "2026-09-25 09:00", "entry": 0.035076, "last": 0.033805, "stop": 0.05482912694721191, "notional": 53.27, "pnl": 1.9, "pnl_pct": 3.62, "to_stop_pct": 38.3, "held_h": 35, "rf": 0.562, "llm": null}], "curve": [["2026-09-25 09:00", 10015.73], ["2026-09-25 10:00", 10027.12], ["2026-09-25 11:00", 10078.44], ["2026-09-25 12:00", 10085.78], ["2026-09-25 14:00", 10072.38], ["2026-09-25 15:00", 10051.55], ["2026-09-25 16:00", 10060.75], ["2026-09-25 17:00", 10069.14], ["2026-09-25 18:00", 10089.06], ["2026-09-25 19:00", 10092.86], ["2026-09-25 20:00", 10094.55], ["2026-09-25 21:00", 10074.31], ["2026-09-25 22:00", 10110.15], ["2026-09-25 23:00", 10116.33], ["2026-09-26 00:00", 10096.24], ["2026-09-26 01:00", 10109.52], ["2026-09-26 02:00", 10098.21], ["2026-09-26 03:00", 10087.04], ["2026-09-26 04:00", 10095.94], ["2026-09-26 05:00", 10083.07], ["2026-09-26 06:00", 10072.91], ["2026-09-26 07:00", 10085.23], ["2026-09-26 08:00", 10091.41], ["2026-09-26 09:00", 10082.69], ["2026-09-26 10:00", 10108.91], ["2026-09-26 11:00", 10105.93], ["2026-09-26 12:00", 10098.19], ["2026-09-26 13:00", 10094.29], ["2026-09-26 14:00", 10101.24], ["2026-09-26 15:00", 10113.91], ["2026-09-26 16:00", 10107.64], ["2026-09-26 17:00", 10101.81], ["2026-09-26 18:00", 10087.4], ["2026-09-26 19:00", 10090.66]], "trades": [{"id": "8b9d070b", "sleeve": "HK", "symbol": "PUMPUSDT", "side": -1, "entry_ts": "2026-09-25 09:00:00+00:00", "entry_px": 0.003955, "exit_ts": "2026-09-25 14:00:00+00:00", "exit_px": 0.004145, "exit_reason": "trend flip", "notional": 262.92, "pnl": -13.1, "return_%": -4.98, "llm_coin": "", "llm_market": ""}, {"id": "517baeed", "sleeve": "HK", "symbol": "BTRUSDT", "side": 1, "entry_ts": "2026-09-25 09:00:00+00:00", "entry_px": 0.05015, "exit_ts": "2026-09-25 10:00:00+00:00", "exit_px": 0.05004, "exit_reason": "trend flip", "notional": 136.33, "pnl": -0.68, "return_%": -0.5, "llm_coin": "", "llm_market": ""}, {"id": "517baeed", "sleeve": "HK", "symbol": "BTRUSDT", "side": 1, "entry_ts": "2026-09-25 09:00:00+00:00", "entry_px": 0.05015, "exit_ts": "2026-09-25 10:00:00+00:00", "exit_px": 0.05004, "exit_reason": "trend flip", "notional": 136.33, "pnl": -0.68, "return_%": -0.5, "llm_coin": "", "llm_market": ""}], "treasury": 0.1, "treasury_rate": 0.0308}], "demo": {"ok": true, "balance": 4999.66, "upnl": -2.24, "available": 4745.45, "recon": [{"symbol": "ADA", "exchange": 306.0, "bot": 306.0, "match": true, "upnl": -0.67}, {"symbol": "AKE", "exchange": -403.0, "bot": -403.0, "match": true, "upnl": -0.53}, {"symbol": "BTC", "exchange": 0.0026, "bot": 0.0026, "match": true, "upnl": -0.38}, {"symbol": "ENA", "exchange": 136.0, "bot": 136.0, "match": true, "upnl": -1.4}, {"symbol": "NEAR", "exchange": 7.0, "bot": 7.0, "match": true, "upnl": -0.49}, {"symbol": "SOL", "exchange": 1.84, "bot": 1.84, "match": true, "upnl": 0.88}, {"symbol": "SUI", "exchange": 42.6, "bot": 42.6, "match": true, "upnl": -0.92}, {"symbol": "UNI", "exchange": 4.0, "bot": 4.0, "match": true, "upnl": -0.68}, {"symbol": "ZEC", "exchange": 0.041, "bot": 0.041, "match": true, "upnl": 1.56}], "all_match": true, "orders": [{"time": "2026-09-26 10:45", "symbol": "AKE", "action": "open", "side": "SELL", "qty": "403", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "ADA", "action": "open", "side": "BUY", "qty": "306", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "SOL", "action": "open", "side": "BUY", "qty": "0.92", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "BTC", "action": "open", "side": "BUY", "qty": "0.0013", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "BTC", "action": "open", "side": "BUY", "qty": "0.0013", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "ENA", "action": "open", "side": "BUY", "qty": "136", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "SUI", "action": "open", "side": "BUY", "qty": "42.6", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "SOL", "action": "open", "side": "BUY", "qty": "0.92", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "UNI", "action": "open", "side": "BUY", "qty": "4", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "ZEC", "action": "open", "side": "BUY", "qty": "0.041", "status": "FILLED"}, {"time": "2026-09-26 10:45", "symbol": "NEAR", "action": "open", "side": "BUY", "qty": "7", "status": "FILLED"}, {"time": "2026-09-25 13:31", "symbol": "AKE", "action": "open", "side": "SELL", "qty": "686", "status": "FILLED"}, {"time": "2026-09-25 13:31", "symbol": "PUMP", "action": "open", "side": "SELL", "qty": "26386", "status": "Invalid symbol status for opening position."}, {"time": "2026-09-25 13:30", "symbol": "ADA", "action": "open", "side": "BUY", "qty": "586", "status": "FILLED"}, {"time": "2026-09-25 13:30", "symbol": "SOL", "action": "open", "side": "BUY", "qty": "1.84", "status": "FILLED"}]}, "health": {"last_run": "2026-09-26T20:03:05Z", "problem": null}, "llm": {"time": "2026-09-26 20:03", "scores": {"BTC": 2.0, "MARKET": 1.0}, "n_logged": 20, "eval": {"scores_logged": 2, "coin_windows_finished": 0, "horizon_h": 72, "ready_for_a_veto_trial": false, "shadow_veto_on_paper_H_trades": {}}}, "backtest": {"period": "Jan 2022 \u2013 Feb 2026 (research years)", "cagr": 37.8, "sharpe": 1.5, "maxdd": -15.7, "trades_pm": 45.8, "win": 39.4, "chain": "$10,000 \u2192 $41,799 from Jan 2022 to Sep 24 2026 (Bitcoin: $17,686)"}, "cone": {"band": [[1, -1.48, -0.35, -0.0, 0.36, 2.06], [2, -1.98, -0.56, -0.03, 0.5, 3.32], [3, -2.33, -0.71, -0.07, 0.67, 4.17], [4, -2.67, -0.85, -0.09, 0.91, 5.29], [5, -2.81, -1.01, -0.11, 1.15, 6.36], [6, -2.95, -1.17, -0.14, 1.42, 7.2], [7, -3.19, -1.21, -0.14, 1.53, 7.71], [8, -3.3, -1.31, -0.14, 1.73, 8.53], [9, -3.46, -1.31, -0.11, 1.88, 8.81], [10, -3.64, -1.45, -0.09, 2.07, 9.03], [11, -3.9, -1.54, 0.01, 2.44, 9.65], [12, -4.14, -1.62, 0.09, 2.74, 10.54], [13, -4.29, -1.72, 0.15, 3.06, 11.41], [14, -4.43, -1.78, 0.15, 3.3, 11.94], [15, -4.58, -1.83, 0.23, 3.56, 12.25], [16, -4.7, -1.89, 0.26, 3.83, 12.52], [17, -4.78, -1.9, 0.31, 4.05, 12.91], [18, -4.87, -1.92, 0.39, 4.25, 13.37], [19, -5.04, -1.95, 0.42, 4.52, 13.71], [20, -5.15, -1.98, 0.45, 4.68, 14.11], [21, -5.35, -1.99, 0.6, 4.85, 14.24], [22, -5.44, -2.0, 0.73, 5.02, 14.57], [23, -5.6, -2.01, 0.81, 5.22, 14.88], [24, -5.62, -2.02, 0.92, 5.53, 14.96], [25, -5.68, -2.04, 1.01, 5.65, 15.37], [26, -5.81, -2.07, 1.11, 5.83, 15.66], [27, -5.96, -2.07, 1.18, 6.15, 15.94], [28, -6.03, -2.06, 1.27, 6.33, 16.33], [29, -6.12, -2.06, 1.39, 6.55, 16.71], [30, -6.18, -2.12, 1.42, 6.71, 17.11], [31, -6.36, -2.11, 1.59, 6.89, 17.34], [32, -6.4, -2.15, 1.62, 7.13, 17.53], [33, -6.54, -2.12, 1.7, 7.26, 17.81], [34, -6.67, -2.13, 1.83, 7.51, 17.98], [35, -6.73, -2.11, 1.87, 7.67, 18.34], [36, -6.79, -2.09, 1.91, 7.9, 18.72], [37, -6.83, -2.13, 2.03, 8.13, 19.25], [38, -6.92, -2.08, 2.09, 8.34, 19.45], [39, -6.99, -2.08, 2.2, 8.47, 19.66], [40, -7.1, -2.04, 2.22, 8.61, 20.02], [41, -7.27, -2.02, 2.43, 8.8, 20.34], [42, -7.32, -2.02, 2.59, 8.98, 20.6], [43, -7.33, -1.98, 2.7, 9.1, 20.77], [44, -7.44, -1.98, 2.85, 9.36, 20.96], [45, -7.48, -1.98, 2.92, 9.46, 21.29], [46, -7.52, -1.99, 2.98, 9.64, 21.87], [47, -7.56, -1.97, 3.09, 9.81, 22.1], [48, -7.6, -1.93, 3.22, 10.01, 22.46], [49, -7.64, -1.95, 3.28, 10.15, 22.72], [50, -7.69, -1.93, 3.3, 10.27, 22.96], [51, -7.79, -1.87, 3.39, 10.41, 23.27], [52, -7.79, -1.85, 3.46, 10.52, 23.53], [53, -7.84, -1.9, 3.48, 10.83, 23.84], [54, -8.0, -1.87, 3.61, 11.07, 24.13], [55, -7.99, -1.88, 3.66, 11.12, 24.59], [56, -8.05, -1.82, 3.8, 11.35, 24.88], [57, -8.05, -1.83, 3.94, 11.46, 24.93], [58, -8.12, -1.84, 3.98, 11.65, 25.32], [59, -8.11, -1.72, 4.13, 11.72, 25.47], [60, -8.11, -1.73, 4.27, 11.86, 25.64]], "live": [[0.0, 0.0], [0.042, 0.03], [0.083, -0.07], [0.125, -0.03], [0.167, -0.12], [0.208, -0.08], [0.25, -0.04], [0.292, 0.04], [0.333, 0.06], [0.375, 0.07], [0.417, -0.02], [0.458, 0.14], [0.5, 0.16], [0.542, 0.07], [0.583, 0.13], [0.625, 0.08], [0.667, 0.03], [0.708, 0.07], [0.75, 0.02], [0.792, -0.03], [0.833, 0.03], [0.875, 0.05], [0.917, 0.02], [0.958, 0.13], [1.0, 0.12], [1.042, 0.08], [1.083, 0.07], [1.125, 0.1], [1.167, 0.15], [1.208, 0.13], [1.25, 0.1], [1.292, 0.04], [1.333, 0.05]], "pct": 58.5, "today": [-1.98, -0.56, -0.03, 0.5, 3.32], "d30": [-6.2, -2.1, 1.4, 6.7, 17.1], "y1": [-5.7, 16.4, 36.3, 60.9, 108.3], "alarm": -23.3, "live_dd": -0.19}, "brake_apr": 0.2, "vrp_q10": -5.19};
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = v => (v < 0 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const sgn = (v, d = 2, suf = "%") => v == null || v === "" ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(+v).toFixed(d) + suf;
+const cls = v => v > 0 ? "pos" : v < 0 ? "neg" : "";
+const px = v => { v = +v; const a = Math.abs(v); return a >= 1000 ? v.toFixed(1) : a >= 1 ? v.toFixed(3) : a >= 0.01 ? v.toFixed(5) : v.toPrecision(4); };
+const COLORS = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)", "var(--s5)", "var(--s6)"];
+const W = D.wallets;
+
+// health
+const gen = new Date(D.generated);
+const lastRun = D.health.last_run ? new Date(D.health.last_run.replace(" ", "T") + (D.health.last_run.endsWith("Z") ? "" : "Z")) : null;
+function ago(t) { const m = Math.round((Date.now() - t) / 60000); return m < 60 ? m + " min ago" : m < 2880 ? Math.round(m / 60) + " h ago" : Math.round(m / 1440) + " days ago"; }
+(function () {
+  const m = lastRun ? (Date.now() - lastRun) / 60000 : 1e9;
+  const b = $("health");
+  if (m < 90) { $("healthText").textContent = "Bot running · last run " + ago(lastRun); }
+  else if (m < 240) { b.classList.add("warn"); $("healthText").textContent = "Late · last run " + ago(lastRun); }
+  else { b.classList.add("down"); $("healthText").textContent = "Stopped? last run " + (lastRun ? ago(lastRun) : "unknown") + " (Mac asleep or off)"; }
+  $("updated").textContent = "page built " + gen.toISOString().slice(0, 16).replace("T", " ") + " UTC · " + ago(gen);
+  if (D.health.problem) $("problem").innerHTML = '<div class="alert">Last run reported: ' + esc(D.health.problem) + "</div>";
+})();
+
+// cards
+$("cards").innerHTML = W.map((w, i) => `
+  <div class="card ${w.name === "v33" ? "main" : ""}">
+    <div class="k"><span class="sw" style="background:${COLORS[i]}"></span>${esc(w.label)}</div>
+    <div class="v">${money(w.equity)}</div>
+    <div class="r ${cls(w.ret_pct)}">${sgn(w.ret_pct)} <span style="color:var(--muted);font-weight:400">since ${esc(w.created.slice(5, 10))}</span></div>
+    <div class="d">${esc(w.about)}</div>
+    <div class="d">${w.positions.length} open · ${w.n_closed} closed (${w.wins} won) · realized ${money(w.realized)}${w.size_mult != null ? " · size ×" + (+w.size_mult).toFixed(2) : ""}</div>
+    ${w.treasury != null ? `<div class="d">+ treasury interest on idle cash ${money(w.treasury)} (${(w.treasury_rate * 100).toFixed(2)}%/yr, kept separate from trading)</div>` : ""}
+  </div>`).join("");
+
+// chart
+(function () {
+  const series = W.map((w, i) => ({ name: w.label, color: COLORS[i], start: w.start,
+    pts: w.curve.map(([t, v]) => [new Date(t.replace(" ", "T") + ":00Z"), (v / w.start - 1) * 100]) })).filter(s => s.pts.length);
+  $("legend").innerHTML = series.map(s => `<span><i style="background:${s.color}"></i>${esc(s.name)}</span>`).join("");
+  if (!series.length) { $("chart").innerHTML = '<p class="note">No hourly marks yet.</p>'; return; }
+  const all = series.flatMap(s => s.pts);
+  let t0 = Math.min(...all.map(p => +p[0])), t1 = Math.max(...all.map(p => +p[0]));
+  if (t1 === t0) t1 = t0 + 3600e3;
+  let lo = Math.min(0, ...all.map(p => p[1])), hi = Math.max(0, ...all.map(p => p[1]));
+  const pad = Math.max(0.25, (hi - lo) * 0.12); lo -= pad; hi += pad;
+  const Wd = 1100, Ht = 300, L = 56, R = 16, T = 12, B = 30;
+  const x = t => L + (t - t0) / (t1 - t0) * (Wd - L - R), y = v => T + (hi - v) / (hi - lo) * (Ht - T - B);
+  const step = niceStep(hi - lo, 5); let g = "";
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) {
+    g += `<line x1="${L}" x2="${Wd - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)" stroke-width="${Math.abs(v) < 1e-9 ? 1.5 : 1}"/>`;
+    g += `<text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--mono)">${sgn(v, step < 1 ? 1 : 0)}</text>`;
+  }
+  const nT = 6;
+  for (let k = 0; k <= nT; k++) { const t = t0 + (t1 - t0) * k / nT, d = new Date(t);
+    g += `<text x="${x(t)}" y="${Ht - 8}" text-anchor="${k === 0 ? "start" : k === nT ? "end" : "middle"}" font-size="12" fill="var(--muted)" font-family="var(--mono)">${d.toISOString().slice(5, 10)} ${d.toISOString().slice(11, 13)}h</text>`; }
+  const lines = series.map(s => `<polyline fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" points="${s.pts.map(p => x(+p[0]).toFixed(1) + "," + y(p[1]).toFixed(1)).join(" ")}"/>`).join("");
+  $("chart").innerHTML = `<svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="Return since start per wallet">${g}${lines}<line id="xh" y1="${T}" y2="${Ht - B}" stroke="var(--muted)" stroke-dasharray="3 3" visibility="hidden"/><rect x="${L}" y="${T}" width="${Wd - L - R}" height="${Ht - T - B}" fill="transparent" id="hit"/></svg>`;
+  const svg = $("chart").querySelector("svg"), tip = $("tip"), xh = svg.querySelector("#xh");
+  svg.querySelector("#hit").addEventListener("mousemove", ev => {
+    const r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) / r.width * Wd, t = t0 + (sx - L) / (Wd - L - R) * (t1 - t0);
+    const rows = series.map(s => { let best = s.pts[0]; for (const p of s.pts) if (Math.abs(p[0] - t) < Math.abs(best[0] - t)) best = p; return [s, best]; });
+    const tt = rows[0][1][0]; xh.setAttribute("x1", x(+tt)); xh.setAttribute("x2", x(+tt)); xh.setAttribute("visibility", "visible");
+    tip.innerHTML = `<div style="color:var(--muted)">${tt.toISOString().slice(0, 16).replace("T", " ")} UTC</div>` + rows.map(([s, p]) => `<div><span style="color:${s.color}">■</span> ${esc(s.name)} <b class="${cls(p[1])}">${sgn(p[1])}</b></div>`).join("");
+    tip.style.display = "block"; const bx = $("chart").getBoundingClientRect();
+    tip.style.left = Math.min(ev.clientX - bx.left + 14, bx.width - tip.offsetWidth - 4) + "px"; tip.style.top = (ev.clientY - bx.top + 20) + "px";
+  });
+  svg.querySelector("#hit").addEventListener("mouseleave", () => { tip.style.display = "none"; xh.setAttribute("visibility", "hidden"); });
+})();
+function niceStep(range, n) { const raw = range / n, p = Math.pow(10, Math.floor(Math.log10(raw))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= raw) return m * p; return 10 * p; }
+
+// demo account
+(function () {
+  const d = D.demo, w = W.find(x => x.name === "v33_testnet");
+  if (!d.ok) { $("demo").innerHTML = `<p class="note">Demo account unavailable: ${esc(d.error || "no data")}</p>`; }
+  else {
+    $("demo").innerHTML = `<dl class="kv">
+      <dt>Exchange USDT balance</dt><dd>${money(d.balance)}</dd>
+      <dt>Open profit/loss (exchange)</dt><dd class="${cls(d.upnl)}">${money(d.upnl)}</dd>
+      <dt>Available margin</dt><dd>${money(d.available)}</dd>
+      <dt>Bot's book for this wallet</dt><dd>${w ? money(w.equity) + " (" + sgn(w.ret_pct) + ")" : "–"}</dd>
+      <dt>Book vs exchange positions</dt><dd class="${d.all_match ? "ok" : "no"}">${d.all_match ? "✓ all match" : "✗ mismatch — see table"}</dd></dl>
+      <p class="note">The demo exchange gave a 5,000 USDT account; the bot keeps its own $10,000 book so it can be compared with the paper wallets. Two sleeves can hold the same coin, so the exchange shows their sum. The bot marks positions at the last hourly close and includes fees; the exchange uses the live price, so the two P/L figures differ slightly.</p>`;
+    $("recon").innerHTML = table(["Coin", "Exchange qty", "Bot qty", "Open P/L", "Match"],
+      d.recon.map(r => [esc(r.symbol), num(r.exchange), num(r.bot), `<span class="${cls(r.upnl)}">${money(r.upnl)}</span>`, r.match ? '<span class="ok">✓</span>' : '<span class="no">✗</span>']), [1, 2, 3]);
+  }
+  $("orders").innerHTML = d.orders && d.orders.length ? "<div style='font:600 12px var(--mono);color:var(--muted);margin-bottom:6px'>LATEST ORDERS SENT</div>" + table(["Time (UTC)", "Coin", "Action", "Side", "Qty", "Result"],
+    d.orders.map(o => [esc(o.time), esc(o.symbol), esc(o.action), esc(o.side), esc(o.qty), `<span class="${o.status === "FILLED" ? "ok" : "no"}">${esc(o.status)}</span>`]), [4]) : '<p class="note">No orders yet.</p>';
+})();
+function num(v) { return (+v).toLocaleString("en-US", { maximumFractionDigits: 6 }); }
+function table(h, rows, numeric = []) {
+  return `<table><thead><tr>${h.map((x, i) => `<th class="${numeric.includes(i) ? "n" : ""}">${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map((c, i) => `<td class="${numeric.includes(i) ? "n" : ""}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+
+// positions with tabs
+(function () {
+  const show = name => {
+    const w = W.find(x => x.name === name);
+    [...$("tabs").children].forEach(b => b.setAttribute("aria-selected", b.dataset.w === name));
+    $("positions").innerHTML = w.positions.length ? table(["Signal", "Coin", "Side", "Opened (UTC)", "Entry", "Last", "Stop", "Size", "P/L", "P/L %", "To stop", "RF", "AI news"],
+      w.positions.map(p => [p.sleeve === "H" ? "Hanna trend" : "Kareem+Hanna", `<b>${esc(p.symbol)}</b>`, `<span class="pill">${p.side}</span>`, esc(p.entry_ts.replace("T", " ")),
+        px(p.entry), px(p.last), px(p.stop), money(p.notional), `<span class="${cls(p.pnl)}">${money(p.pnl)}</span>`, `<span class="${cls(p.pnl_pct)}">${sgn(p.pnl_pct)}</span>`,
+        p.to_stop_pct + "%", p.rf == null ? "–" : (+p.rf).toFixed(2), p.llm == null || p.llm === "" ? "–" : sgn(+p.llm, 2, "")]), [4, 5, 6, 7, 8, 9, 10, 11, 12])
+      : '<p class="note">No open positions.</p>';
+    try { localStorage.setItem("tab", name); } catch (e) {}
+  };
+  $("tabs").innerHTML = W.map(w => `<button role="tab" data-w="${w.name}">${esc(w.label)} (${w.positions.length})</button>`).join("");
+  $("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) show(b.dataset.w); });
+  let first = "v33"; try { first = localStorage.getItem("tab") || first; } catch (e) {}
+  show(W.some(w => w.name === first) ? first : W[0].name);
+})();
+
+// closed trades across wallets
+(function () {
+  const rows = W.flatMap(w => w.trades.map(t => ({ ...t, wallet: w.label }))).sort((a, b) => String(b.exit_ts).localeCompare(String(a.exit_ts))).slice(0, 25);
+  $("trades").innerHTML = rows.length ? table(["Closed (UTC)", "Wallet", "Signal", "Coin", "Side", "Entry", "Exit", "Why", "P/L", "Return"],
+    rows.map(t => [esc(String(t.exit_ts).slice(0, 16)), esc(t.wallet), t.sleeve === "H" ? "Hanna trend" : "Kareem+Hanna", `<b>${esc(String(t.symbol).replace("USDT", ""))}</b>`,
+      `<span class="pill">${t.side > 0 ? "LONG" : "SHORT"}</span>`, px(t.entry_px), px(t.exit_px), esc(t.exit_reason), `<span class="${cls(t.pnl)}">${money(+t.pnl)}</span>`, `<span class="${cls(t["return_%"])}">${sgn(+t["return_%"])}</span>`]), [5, 6, 8, 9])
+    : '<p class="note">No closed trades yet.</p>';
+})();
+
+// live vs backtest cone
+(function () {
+  const C = D.cone || {};
+  if (!C.band) { $("cone").innerHTML = '<p class="note">Cone unavailable' + (C.error ? ": " + esc(C.error) : "") + '</p>'; $("conekv").innerHTML = ""; return; }
+  const Wd = 560, Ht = 260, L = 44, R = 10, T = 10, B = 28;
+  const xmax = C.band[C.band.length - 1][0];
+  const ys = C.band.flatMap(r => [r[1], r[5]]).concat(C.live.map(p => p[1]), [0]);
+  const y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const X = d => L + d / xmax * (Wd - L - R), Y = v => T + (y1 - v) / (y1 - y0 || 1) * (Ht - T - B);
+  const area = (a, b) => "M" + X(0) + "," + Y(0) + C.band.map(r => "L" + X(r[0]) + "," + Y(r[a])).join("") +
+    C.band.slice().reverse().map(r => "L" + X(r[0]) + "," + Y(r[b])).join("") + "L" + X(0) + "," + Y(0) + "Z";
+  const step = niceStep(y1 - y0, 5); let g = "";
+  for (let v = Math.ceil(y0 / step) * step; v <= y1; v += step)
+    g += `<line x1="${L}" x2="${Wd - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid, #8883)"/><text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end" font-size="10" fill="var(--muted)">${v.toFixed(0)}%</text>`;
+  const med = "M" + X(0) + "," + Y(0) + C.band.map(r => "L" + X(r[0]) + "," + Y(r[3])).join("");
+  const live = C.live.map((p, i) => (i ? "L" : "M") + X(p[0]) + "," + Y(p[1])).join("");
+  $("cone").innerHTML = `<svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="Live wallet against the backtest cone">${g}
+    <path d="${area(1, 5)}" fill="#4f79b8" opacity="0.18"/><path d="${area(2, 4)}" fill="#4f79b8" opacity="0.30"/>
+    <path d="${med}" fill="none" stroke="#4f79b8" stroke-dasharray="4 3" stroke-width="1"/>
+    <path d="${live}" fill="none" stroke="#d1495b" stroke-width="2.4"/>
+    <text x="${Wd - R}" y="${Ht - 8}" text-anchor="end" font-size="10" fill="var(--muted)">days since start (${xmax})</text></svg>`;
+  const f = v => sgn(v, 1), band = a => `${f(a[0])} … ${f(a[4])} (median ${f(a[2])})`;
+  const below = C.live.length && (C.live[C.live.length - 1][1] < C.today[0] || C.live_dd < C.alarm);
+  $("conekv").innerHTML = `
+    <dt>Status</dt><dd>${below ? '<span class="no">below the cone: investigate</span>' : '<span class="ok">inside the cone</span>'}</dd>
+    <dt>Live wallet percentile</dt><dd>${C.pct}th of 10,000 backtest futures</dd>
+    <dt>Expected range today</dt><dd>${band(C.today)}</dd>
+    <dt>Range after 30 days</dt><dd>${band(C.d30)}</dd>
+    <dt>Range after 1 year</dt><dd>${band(C.y1)}</dd>
+    <dt>Alarm: worst drop</dt><dd>${f(C.alarm)} (live so far ${f(C.live_dd)})</dd>`;
+})();
+
+// gauges and expectations
+(function () {
+  const m = W.find(w => w.name === "v33") || W[0], v = W.find(w => w.name === "v33_vrp"), L = D.llm || {};
+  const crowd = m.crowding_apr, braked = crowd != null && crowd > D.brake_apr;
+  const vrp = v ? v.vrp : null;
+  $("gauges").innerHTML = `
+    <dt>Market crowding (funding, yearly)</dt><dd>${crowd == null ? "–" : sgn(crowd * 100, 1)} ${braked ? '<span class="no">brake ON: new bets halved</span>' : '<span class="ok">brake off</span>'}</dd>
+    <dt>Options stress gauge (BTC VRP)</dt><dd>${vrp == null ? "–" : (+vrp).toFixed(1) + " vol pts"} ${vrp == null ? "" : vrp < D.vrp_q10 ? '<span class="no">stress: test wallet halves bets</span>' : '<span class="ok">normal</span>'}</dd>
+    <dt>AI news mood (whole market)</dt><dd>${L.scores && L.scores.MARKET != null ? sgn(L.scores.MARKET, 2, "") + " on −2…+2" : "–"} <span style="color:var(--muted)">${L.time ? "at " + esc(L.time) : ""}</span></dd>
+    <dt>AI news scores logged</dt><dd>${L.n_logged || 0} (logged only, never traded)</dd>`;
+  const B = D.backtest;
+  $("expect").innerHTML = `
+    <dt>Backtest period</dt><dd>${esc(B.period)}</dd>
+    <dt>Average yearly return</dt><dd>+${B.cagr}% (about +${(B.cagr / 12).toFixed(1)}% a month, very uneven)</dd>
+    <dt>Sharpe / worst drop</dt><dd>${B.sharpe.toFixed(2)} / ${sgn(B.maxdd, 1)}</dd>
+    <dt>Trades per month</dt><dd>≈ ${Math.round(B.trades_pm)} (win rate ${B.win}%: small losses, fewer big wins)</dd>
+    <dt>Longer record</dt><dd style="white-space:normal">${esc(B.chain)}</dd>`;
+})();
+</script>
+</body>
+</html>
